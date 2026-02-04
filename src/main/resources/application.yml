@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: movie-review-api
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/movie_review_db?useSSL=false&serverTimezone=UTC
+    username: root
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  secret: verySecretKeyChangeLater
+  expiration: 86400000 # 1 día
