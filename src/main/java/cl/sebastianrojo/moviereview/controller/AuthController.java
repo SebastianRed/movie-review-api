@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,8 @@ import cl.sebastianrojo.moviereview.repository.UserRepository;
 import cl.sebastianrojo.moviereview.security.JwtUtil;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -52,7 +54,12 @@ public class AuthController {
         if(userRepository.existsByUsername(request.username())) {
             throw new RuntimeException("El nombre de usuario ya existe");
         }
-        User user = new User(request.username(), request.username() + "@mail.com", passwordEncoder.encode(request.password()), Role.USER);
+        User user = new User(
+            request.username(), 
+            passwordEncoder.encode(request.password()), 
+            request.username() + "@mail.com", 
+            Role.USER
+        );
         userRepository.save(user);
     }
 }
