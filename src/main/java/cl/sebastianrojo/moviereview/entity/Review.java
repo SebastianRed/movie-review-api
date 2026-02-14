@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,18 +18,24 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "reviews", uniqueConstraints = {@UniqueConstraint(columnNames = {"external_content_id", "content_type", "user_id"})})
+@Table(name = "reviews", 
+       uniqueConstraints = {
+           @UniqueConstraint(
+               name = "uk_user_content",
+               columnNames = {"user_id", "external_content_id", "content_type"}
+           )
+       })
 public class Review {
     
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "external_content_id", nullable = false)
+    @Column(name = "external_content_id", nullable = false, length = 100)
     private String externalContentId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "content_type", nullable = false)
+    @Column(name = "content_type", nullable = false, length = 20)
     private ContentType contentType;
 
     @Column(nullable = false)
@@ -37,29 +44,30 @@ public class Review {
     @Column(length = 1000)
     private String comment;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Review() {}
 
     @PrePersist
-    public void onCreate() {
+    protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = createdAt;
     }
 
     @PreUpdate
-    public void onUpdate() {
+    protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
